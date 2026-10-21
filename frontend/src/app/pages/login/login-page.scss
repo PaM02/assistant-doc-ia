@@ -1,0 +1,39 @@
+.login {
+  max-width: 400px;
+  margin: 40px auto 0;
+  padding: 28px 24px;
+
+  h1 { font-size: 24px; margin-bottom: 4px; }
+  > p { margin: 0 0 20px; font-size: 14px; }
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+input {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px 12px;
+  background: var(--surface);
+  font-weight: 400;
+
+  &:focus { outline: 2px solid var(--primary); outline-offset: -1px; border-color: transparent; }
+}
+
+.btn { margin-top: 4px; height: 42px; }
+
+.hint {
+  margin: 18px 0 0;
+  font-size: 13px;
+}

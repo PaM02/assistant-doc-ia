@@ -1,0 +1,28 @@
+<section class="login card">
+  <h1>Connexion</h1>
+  <p class="muted">Connectez-vous pour consulter les documents et interroger l'assistant.</p>
+
+  <form (ngSubmit)="submit()" #form="ngForm">
+    <label>
+      Identifiant
+      <input name="username" [(ngModel)]="username" required autocomplete="username" autofocus />
+    </label>
+    <label>
+      Mot de passe
+      <input name="password" type="password" [(ngModel)]="password" required autocomplete="current-password" />
+    </label>
+
+    @if (error(); as message) {
+      <div class="alert alert-error" role="alert">{{ message }}</div>
+    }
+
+    <button class="btn btn-primary" type="submit" [disabled]="loading() || form.invalid">
+      @if (loading()) { <span class="spinner" aria-hidden="true"></span> } Se connecter
+    </button>
+  </form>
+
+  <p class="hint muted">
+    Comptes de démonstration : <strong>admin</strong> (import et suppression) et
+    <strong>lecteur</strong> (consultation et assistant).
+  </p>
+</section>

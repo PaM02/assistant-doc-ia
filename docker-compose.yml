@@ -1,0 +1,52 @@
+# Application complète : base PostgreSQL/pgvector + backend Spring Boot + frontend Angular (Nginx)
+#   docker compose up -d --build      puis ouvrir http://localhost:8090
+# Les secrets (GROQ_API_KEY, JWT_SECRET, ADMIN_PASSWORD, USER_PASSWORD) sont lus dans backend/.env
+name: assistant-doc-ia
+
+services:
+  db:
+    image: pgvector/pgvector:pg17
+    environment:
+      POSTGRES_DB: assistantdoc
+      POSTGRES_USER: assistantdoc
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-assistantdoc}
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U assistantdoc -d assistantdoc"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+  backend:
+    build: ./backend
+    image: assistant-doc-ia/backend:local
+    env_file:
+      - path: ./backend/.env
+        required: false
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/assistantdoc
+      SPRING_DATASOURCE_USERNAME: assistantdoc
+      SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD:-assistantdoc}
+    volumes:
+      # Le modèle d'embedding (~120 Mo) est téléchargé une seule fois puis conservé
+      - model-cache:/home/app/.cache
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: unless-stopped
+
+  frontend:
+    build: ./frontend
+    image: assistant-doc-ia/frontend:local
+    ports:
+      - "8090:80"
+    depends_on:
+      backend:
+        condition: service_healthy
+    restart: unless-stopped
+
+volumes:
+  db-data:
+  model-cache:

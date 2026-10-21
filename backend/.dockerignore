@@ -1,0 +1,8 @@
+# Fichiers inutiles (ou secrets) à ne jamais envoyer dans l'image Docker
+target/
+tessdata/
+.env
+*.iml
+.idea/
+compose.yaml
+HELP.md

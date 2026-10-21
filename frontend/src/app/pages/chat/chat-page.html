@@ -1,0 +1,73 @@
+<section class="chat card">
+  <header class="chat-header">
+    <div>
+      <h1>Assistant</h1>
+      <p class="muted">Posez une question : la réponse s'appuie uniquement sur vos documents, avec ses sources.</p>
+    </div>
+    @if (messages().length > 0) {
+      <button class="btn btn-ghost" type="button" (click)="clear()">Nouvelle conversation</button>
+    }
+  </header>
+
+  <div class="messages" #scroller>
+    @if (messages().length === 0) {
+      <div class="welcome">
+        <p class="muted">Exemples de questions :</p>
+        <div class="examples">
+          @for (example of examples; track example) {
+            <button class="btn btn-ghost" type="button" (click)="send(example)">{{ example }}</button>
+          }
+        </div>
+      </div>
+    }
+
+    @for (message of messages(); track $index; let i = $index) {
+      @switch (message.role) {
+        @case ('user') {
+          <div class="bubble user">{{ message.text }}</div>
+        }
+        @case ('error') {
+          <div class="alert alert-error" role="alert">{{ message.text }}</div>
+        }
+        @default {
+          <div class="bubble assistant">
+            <div class="answer" [innerHTML]="message.html" (click)="onAnswerClick($event, i)"></div>
+            @if (message.sources?.length) {
+              <div class="sources">
+                <span class="muted">Sources :</span>
+                @for (source of message.sources; track source.number) {
+                  @let key = i + '-' + source.number;
+                  <div class="source" [class.open]="openSource() === key">
+                    <button type="button" (click)="toggleSource(key)" [attr.aria-expanded]="openSource() === key">
+                      <span class="num">{{ source.number }}</span>
+                      <span class="file">{{ source.fileName }}</span>
+                      <span class="muted">passage {{ source.chunkIndex + 1 }} · pertinence {{ source.score * 100 | number:'1.0-0' }} %</span>
+                    </button>
+                    @if (openSource() === key) {
+                      <blockquote>{{ source.excerpt }}</blockquote>
+                    }
+                  </div>
+                }
+              </div>
+            }
+          </div>
+        }
+      }
+    }
+
+    @if (sending()) {
+      <div class="bubble assistant thinking">
+        <span class="spinner" aria-hidden="true"></span> Recherche dans les documents et rédaction de la réponse…
+      </div>
+    }
+  </div>
+
+  <form class="composer" (ngSubmit)="send()">
+    <textarea name="question" rows="2" [(ngModel)]="question" (keydown)="onKeydown($event)" maxlength="1000"
+              placeholder="Posez votre question…" aria-label="Votre question"
+              title="Entrée pour envoyer, Maj+Entrée pour aller à la ligne"></textarea>
+    <button class="btn btn-primary" type="submit" [disabled]="sending() || !question.trim()">
+      @if (sending()) { <span class="spinner" aria-hidden="true"></span> } Envoyer
+    </button>
+  </form>
+</section>

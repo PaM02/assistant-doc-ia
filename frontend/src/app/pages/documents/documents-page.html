@@ -1,0 +1,75 @@
+<section class="intro">
+  <h1>Documents</h1>
+  <p class="muted">
+    Importez des PDF ou des images. Le texte est extrait (directement ou par OCR pour les scans),
+    découpé en passages et indexé pour l'assistant.
+  </p>
+</section>
+
+@if (auth.isAdmin()) {
+  <label class="dropzone card" [class.over]="dragOver()" [class.busy]="uploadingFile()"
+         (dragover)="onDragOver($event)" (dragleave)="dragOver.set(false)" (drop)="onDrop($event)">
+    <input #fileInput type="file" multiple [accept]="accept" (change)="onFileInput(fileInput)"
+           [disabled]="!!uploadingFile()" />
+    @if (uploadingFile(); as name) {
+      <span class="spinner big" aria-hidden="true"></span>
+      <strong>Traitement de « {{ name }} »…</strong>
+      <span class="muted">Extraction du texte, OCR si nécessaire, puis indexation.</span>
+    } @else {
+      <svg viewBox="0 0 24 24" width="36" height="36" fill="none" stroke="currentColor" stroke-width="1.8"
+           stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M12 16V4"/><path d="m7 9 5-5 5 5"/><path d="M5 20h14"/>
+      </svg>
+      <strong>Glissez vos fichiers ici ou cliquez pour choisir</strong>
+      <span class="muted">PDF (texte ou scanné), PNG, JPEG, TIFF · 20 Mo maximum</span>
+    }
+  </label>
+} @else {
+  <div class="alert readonly">Compte en lecture seule : l'import et la suppression sont réservés aux administrateurs.</div>
+}
+
+@if (message(); as msg) {
+  <div class="alert" [class.alert-success]="msg.type === 'success'" [class.alert-error]="msg.type === 'error'"
+       role="status">{{ msg.text }}</div>
+}
+
+<section class="card list">
+  <header class="list-header">
+    <h2>Documents importés</h2>
+    <span class="muted">{{ documents().length }} document(s)</span>
+  </header>
+
+  @if (loading() && documents().length === 0) {
+    <p class="empty muted">Chargement…</p>
+  } @else if (documents().length === 0) {
+    <p class="empty muted">Aucun document pour l'instant. Importez-en un pour commencer.</p>
+  } @else {
+    <ul>
+      @for (doc of documents(); track doc.id) {
+        <li [class.selected]="selected()?.id === doc.id">
+          <button class="doc-main" type="button" (click)="show(doc)" [attr.aria-expanded]="selected()?.id === doc.id">
+            <span class="doc-name">{{ doc.fileName }}</span>
+            <span class="doc-meta muted">
+              {{ doc.pageCount }} page(s) · {{ formatSize(doc.sizeBytes) }} ·
+              {{ doc.characterCount | number:'1.0-0' }} caractères · {{ doc.createdAt | date:'dd/MM/yyyy HH:mm' }}
+            </span>
+          </button>
+          <span class="badge" [class.badge-text]="doc.extractionMethod === 'TEXT'"
+                [class.badge-ocr]="doc.extractionMethod === 'OCR'"
+                [title]="doc.extractionMethod === 'OCR' ? 'Texte reconnu par OCR' : 'Texte lu directement dans le PDF'">
+            {{ doc.extractionMethod === 'OCR' ? 'OCR' : 'TEXTE' }}
+          </span>
+          @if (auth.isAdmin()) {
+            <button class="btn btn-danger-ghost" type="button" (click)="remove(doc)">Supprimer</button>
+          }
+        </li>
+        @if (selected()?.id === doc.id) {
+          <li class="preview">
+            <p class="muted">Texte extrait :</p>
+            <pre>{{ selected()!.content }}</pre>
+          </li>
+        }
+      }
+    </ul>
+  }
+</section>

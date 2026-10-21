@@ -1,0 +1,15 @@
+services:
+  postgres:
+    image: 'pgvector/pgvector:pg17'
+    container_name: assistantdoc-db
+    environment:
+      - 'POSTGRES_DB=assistantdoc'
+      - 'POSTGRES_USER=assistantdoc'
+      - 'POSTGRES_PASSWORD=assistantdoc'
+    ports:
+      - '5433:5432'
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+volumes:
+  pgdata:

@@ -1,0 +1,109 @@
+.intro {
+  margin-bottom: 18px;
+  h1 { font-size: 26px; margin-bottom: 4px; }
+  p { margin: 0; max-width: 680px; }
+}
+
+.dropzone {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 32px 16px;
+  border: 2px dashed var(--border);
+  text-align: center;
+  cursor: pointer;
+  color: var(--primary);
+  transition: border-color .15s, background-color .15s;
+
+  strong { color: var(--text); }
+  input { display: none; }
+
+  &:hover, &.over { border-color: var(--primary); background: var(--primary-soft); }
+  &.busy { cursor: progress; border-style: solid; }
+
+  .spinner.big { width: 28px; height: 28px; border-width: 3px; }
+}
+
+.alert { margin-top: 14px; }
+.alert.readonly { margin-top: 0; background: var(--surface-muted); color: var(--text-muted); }
+
+.list {
+  margin-top: 20px;
+  overflow: hidden;
+
+  ul { list-style: none; margin: 0; padding: 0; }
+
+  li {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 16px;
+    border-top: 1px solid var(--border);
+
+    &.selected { background: var(--surface-muted); }
+  }
+}
+
+.list-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  padding: 14px 16px;
+  h2 { font-size: 16px; }
+}
+
+.empty { padding: 4px 16px 18px; margin: 0; }
+
+.doc-main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  background: none;
+  border: none;
+  padding: 0;
+  text-align: left;
+  cursor: pointer;
+
+  &:hover .doc-name { color: var(--primary); }
+}
+
+.doc-name {
+  font-weight: 600;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.doc-meta { font-size: 13px; }
+
+.list li.preview {
+  display: block;
+  background: var(--surface-muted);
+  border-top: none;
+  padding-top: 0;
+
+  p { margin: 0 0 6px; font-size: 13px; }
+
+  pre {
+    margin: 0;
+    max-height: 320px;
+    overflow: auto;
+    white-space: pre-wrap;
+    word-break: break-word;
+    font-family: inherit;
+    font-size: 14px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px;
+  }
+}
+
+@media (max-width: 560px) {
+  .list li { flex-wrap: wrap; }
+  .doc-main { flex-basis: 100%; }
+}
